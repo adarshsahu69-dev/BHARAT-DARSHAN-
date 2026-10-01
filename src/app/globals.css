@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --header-height: 4rem;
+    --bottom-nav-height: 4.25rem;
+    color-scheme: light;
+  }
+
+  * {
+    @apply border-sand-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  body {
+    @apply bg-ivory font-sans text-charcoal antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-charcoal;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible, consistent focus ring across the whole app. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-saffron-500 ring-offset-2 ring-offset-ivory;
+  }
+
+  ::selection {
+    @apply bg-saffron-200 text-maroon-900;
+  }
+
+  /* Slim, on-brand scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.sand.300') transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full border-[3px] border-solid border-transparent bg-sand-300 bg-clip-content;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-sand-400 bg-clip-content;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-reading {
+    @apply mx-auto w-full max-w-3xl px-4 sm:px-6;
+  }
+
+  /* --- Buttons ------------------------------------------------------- */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 ease-premium disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-maroon-700 text-sand-50 shadow-card hover:bg-maroon-800 hover:shadow-card-hover active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn border border-sand-300 bg-white/80 text-charcoal hover:border-sand-400 hover:bg-white active:scale-[0.98];
+  }
+
+  .btn-accent {
+    @apply btn bg-saffron-500 text-maroon-950 shadow-card hover:bg-saffron-400 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn text-charcoal-soft hover:bg-sand-100 hover:text-charcoal;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-700;
+  }
+
+  .btn-sm {
+    @apply px-3.5 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-7 py-3.5 text-base;
+  }
+
+  /* --- Surfaces ------------------------------------------------------ */
+  .card {
+    @apply rounded-2xl border border-sand-200 bg-white shadow-card;
+  }
+
+  .card-interactive {
+    @apply card transition-all duration-300 ease-premium hover:-translate-y-1 hover:border-sand-300 hover:shadow-card-hover;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-sand-200 bg-white px-3 py-1 text-xs font-medium text-charcoal-soft transition-colors hover:border-saffron-400 hover:text-maroon-700;
+  }
+
+  .chip-active {
+    @apply border-maroon-700 bg-maroon-700 text-sand-50 hover:border-maroon-800 hover:text-sand-50;
+  }
+
+  /* --- Forms --------------------------------------------------------- */
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-charcoal;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-sand-300 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-charcoal-muted/70 transition-colors hover:border-sand-400 focus:border-saffron-500 focus:outline-none focus:ring-2 focus:ring-saffron-500/30 disabled:bg-sand-50 disabled:text-charcoal-muted;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:border-danger-500 focus:ring-danger-500/30;
+  }
+
+  .textarea {
+    @apply input min-h-24 resize-y;
+  }
+
+  .fieldset {
+    @apply space-y-1.5;
+  }
+
+  .form-error {
+    @apply flex items-start gap-1.5 text-sm font-medium text-danger-700;
+  }
+
+  /* --- Typography helpers -------------------------------------------- */
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-saffron-700;
+  }
+
+  .prose-heritage {
+    @apply max-w-none text-[0.975rem] leading-[1.75] text-charcoal-soft;
+  }
+
+  .prose-heritage p + p {
+    @apply mt-4;
+  }
+
+  .prose-heritage strong {
+    @apply font-semibold text-charcoal;
+  }
+
+  /* Decorative heritage motif: a thin gold rule with a centre diamond. */
+  .rule-ornament {
+    @apply relative mx-auto h-px w-40 bg-gold-rule;
+  }
+
+  .rule-ornament::after {
+    content: '';
+    @apply absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-saffron-500;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-maroon-800 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-sand-50;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-sand-200/70;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent;
+  }
+
+  /* Subtle archival paper texture for editorial sections. */
+  .paper-texture {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(209, 181, 133, 0.14) 0%, transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(176, 77, 44, 0.08) 0%, transparent 50%),
+      linear-gradient(180deg, #fdfbf7 0%, #f4ece0 100%);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mask-fade-r {
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+  }
+}
+
+/* Leaflet overrides so map chrome matches the heritage palette. */
+.leaflet-container {
+  @apply h-full w-full bg-sand-100 font-sans;
+  z-index: 0;
+}
+
+.leaflet-control-attribution {
+  @apply !bg-white/85 !text-[10px] !text-charcoal-muted backdrop-blur;
+}
+
+.leaflet-control-attribution a {
+  @apply !text-maroon-700;
+}
+
+.leaflet-bar {
+  @apply !rounded-xl !border-0 !shadow-card;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  @apply !border-0 !border-b !border-solid !border-sand-200 !bg-white !text-charcoal hover:!bg-sand-100;
+}
+
+.bd-marker {
+  @apply flex items-center justify-center;
+}
+
+.bd-marker__pin {
+  @apply relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-maroon-700 text-white shadow-card-hover transition-transform;
+}
+
+.bd-marker--active .bd-marker__pin {
+  @apply scale-110 bg-saffron-500 text-maroon-950;
+}
+
+.bd-marker__pin::after {
+  content: '';
+  @apply absolute inset-0 -z-10 rounded-full bg-maroon-700/40 animate-pulse-ring;
+}
+
+.bd-marker--active .bd-marker__pin::after {
+  @apply bg-saffron-500/50;
+}
+
+.bd-popup .leaflet-popup-content-wrapper {
+  @apply rounded-2xl border border-sand-200 bg-white p-0 shadow-card-hover;
+}
+
+.bd-popup .leaflet-popup-content {
+  @apply m-0 w-64;
+}
+
+.bd-popup .leaflet-popup-tip {
+  @apply border border-sand-200 bg-white;
+}
+
+.bd-popup a.leaflet-popup-close-button {
+  @apply !right-2 !top-1 !flex !h-6 !w-6 !items-center !justify-center !rounded-full !text-charcoal-muted hover:!bg-sand-100;
+}
+
+/* Print styles: itinerary and destination detail should print cleanly. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    @apply bg-white;
+  }
+}
