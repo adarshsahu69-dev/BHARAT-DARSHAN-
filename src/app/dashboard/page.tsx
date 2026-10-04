@@ -7,8 +7,6 @@ export const metadata: Metadata = privateMetadata(
   'Your saved places, planned trips and recently viewed destinations.',
 );
 
-export const dynamic = 'force-dynamic';
-
 export default function DashboardPage() {
   return <Dashboard />;
 }

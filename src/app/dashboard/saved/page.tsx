@@ -7,8 +7,6 @@ export const metadata: Metadata = privateMetadata(
   'The heritage destinations you have bookmarked.',
 );
 
-export const dynamic = 'force-dynamic';
-
 export default function SavedPlacesPage() {
   return <SavedPlaces />;
 }

@@ -7,8 +7,6 @@ export const metadata: Metadata = privateMetadata(
   'Every trip you have planned, with scheduling progress for each.',
 );
 
-export const dynamic = 'force-dynamic';
-
 export default function MyTripsPage() {
   return <MyTrips />;
 }

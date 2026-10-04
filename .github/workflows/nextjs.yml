@@ -51,7 +51,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Next.js 15 warns that Node 20 is on its way out; 22 is the oldest
+          # supported version that builds without a deprecation warning.
+          node-version: "22"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -60,6 +62,8 @@ jobs:
           # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
           #
           # You may remove this line if you want to manage the configuration yourself.
+          # Removing it is safe: next.config.ts already sets `output: 'export'`,
+          # `trailingSlash` and `images.unoptimized` for the Pages host.
           static_site_generator: next
       - name: Restore cache
         uses: actions/cache@v4

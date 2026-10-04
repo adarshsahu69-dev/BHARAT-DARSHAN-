@@ -7,12 +7,15 @@ import { appConfig } from '@/lib/config';
 import { HISTORICAL_PERIOD_META } from '@/data/timeline';
 
 /**
- * Rendered per request, not prerendered: the destination browser reads its
- * filters from the query string, and a static build has no query string at
- * build time. Per-request rendering lets the server emit the real, filtered
- * cards so a shared link lands on content instead of loading skeletons.
+ * Prerendered to a shell, filtered in the browser.
+ *
+ * The destination browser reads its filters from the query string, which a
+ * static build never sees — the site is exported with `output: 'export'` and
+ * served as files by GitHub Pages, so there is no per-request rendering. The
+ * `Suspense` boundary below means the prerendered HTML carries the hero and the
+ * grid skeleton, and the real filtered cards replace it on hydration. A shared
+ * filtered link still lands on the right content, one hydration step later.
  */
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Historical places',

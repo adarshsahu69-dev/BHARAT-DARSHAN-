@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 };
 
 /** Leaflet touches `window`, so the map page is client-rendered only. */
-export const dynamic = 'force-dynamic';
 
 export default function MapPage() {
   return (

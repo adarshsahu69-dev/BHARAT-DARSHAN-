@@ -10,7 +10,13 @@ import { appConfig } from '@/lib/config';
  * Only public, indexable routes appear. Anything per-user (dashboard, trips,
  * admin) and anything noindex (auth pages, search) is deliberately excluded —
  * a sitemap that lists noindex URLs is a contradiction.
+ *
+ * `force-static` is required: the site is exported with `output: 'export'`, and
+ * this route is built from data known at build time, so it must be written to
+ * `sitemap.xml` as a file instead of rendered per request.
  */
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date('2026-01-15T00:00:00.000Z');
 

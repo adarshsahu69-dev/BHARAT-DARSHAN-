@@ -7,8 +7,6 @@ export const metadata: Metadata = privateMetadata(
   'Manage your account details and see where your data is stored.',
 );
 
-export const dynamic = 'force-dynamic';
-
 export default function ProfilePage() {
   return <ProfileSettings />;
 }

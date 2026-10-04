@@ -10,6 +10,7 @@ import { Modal, useDisclosure } from '@/components/ui/modal';
 import { redirectToLogin } from '@/lib/auth/redirect';
 import { toISODate } from '@/lib/utils';
 import type { Destination, Trip } from '@/lib/types';
+import { itineraryHref } from '@/lib/routes';
 
 /**
  * Adds a destination to an existing trip, or creates one on the fly.
@@ -100,14 +101,14 @@ export function AddToTripButton({
 
     if (!added.ok) {
       toast({ variant: 'warning', title: `Created “${name}”`, description: added.error });
-      router.push(`/trip-planner/trips/${trip.id}`);
+      router.push(itineraryHref(trip.id));
       return;
     }
 
     void recordActivity(profile.id, destination.id, 'trip_add');
     toast({ variant: 'success', title: `Created “${name}” with ${destination.name}` });
     dialog.close();
-    router.push(`/trip-planner/trips/${trip.id}`);
+    router.push(itineraryHref(trip.id));
   };
 
   const onClick = () => {

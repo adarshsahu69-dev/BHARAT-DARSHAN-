@@ -18,15 +18,15 @@ export const metadata: Metadata = {
 };
 
 /**
- * Rendered per request rather than prerendered.
+ * Prerendered to a shell, filtered in the browser.
  *
- * The browser reads its filters from the query string, and a statically
- * prerendered page has no query string at build time — which would leave the
- * first paint as nothing but skeletons. Rendering per request means the
- * server already knows the filters and emits the real result cards, so a shared
- * filtered link lands on content rather than a loading state.
+ * The browser reads its filters from the query string, which a static build
+ * never sees — the site is exported with `output: 'export'` and served as files
+ * by GitHub Pages, so there is no per-request rendering. The `Suspense`
+ * boundary below puts the grid skeleton in the prerendered HTML; the real
+ * filtered cards replace it on hydration, so a shared filtered link still lands
+ * on the right content one step later.
  */
-export const dynamic = 'force-dynamic';
 
 export default function DestinationsPage() {
   return (

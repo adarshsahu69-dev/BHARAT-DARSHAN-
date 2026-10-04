@@ -9,6 +9,7 @@ import { getTripWithStops, getTrips, summariseTrips } from '@/lib/store/user-dat
 import { EmptyState, TripCardSkeleton } from '@/components/ui/states';
 import { daysBetween, formatDate, formatDateRange } from '@/lib/utils';
 import type { TripWithStops } from '@/lib/types';
+import { itineraryHref } from '@/lib/routes';
 
 /** The dashboard's trip list, with fuller detail than the compact panel. */
 export function MyTrips() {
@@ -104,7 +105,7 @@ export function MyTrips() {
               <li key={trip.id} className="card flex flex-col p-5">
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="text-lg font-semibold leading-snug text-charcoal">
-                    <Link href={`/trip-planner/trips/${trip.id}`} className="hover:text-maroon-800">
+                    <Link href={itineraryHref(trip.id)} className="hover:text-maroon-800">
                       {trip.name}
                     </Link>
                   </h2>
@@ -161,7 +162,7 @@ export function MyTrips() {
                 </p>
 
                 <div className="mt-4 flex gap-2 border-t border-sand-200 pt-4">
-                  <Link href={`/trip-planner/trips/${trip.id}`} className="btn-primary btn-sm flex-1">
+                  <Link href={itineraryHref(trip.id)} className="btn-primary btn-sm flex-1">
                     View itinerary
                   </Link>
                   <Link href="/trip-planner" className="btn-secondary btn-sm">

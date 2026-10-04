@@ -7,8 +7,6 @@ export const metadata: Metadata = privateMetadata(
   'Manage destination records, categories, users and reported content.',
 );
 
-export const dynamic = 'force-dynamic';
-
 export default function AdminPage() {
   return <AdminPanel />;
 }

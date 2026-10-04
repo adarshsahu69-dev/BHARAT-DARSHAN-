@@ -20,6 +20,7 @@ import { ConfirmDialog, Modal, useDisclosure } from '@/components/ui/modal';
 import { EmptyState, ErrorState, TripCardSkeleton } from '@/components/ui/states';
 import { addDays, cn, daysBetween, formatDate, formatDateRange, toISODate } from '@/lib/utils';
 import type { Trip } from '@/lib/types';
+import { itineraryHref } from '@/lib/routes';
 
 /**
  * Trip list and creation.
@@ -182,7 +183,7 @@ export function TripPlanner() {
                       {past ? 'Completed trip' : 'Planned trip'}
                     </p>
                     <h2 className="mt-1 text-lg font-semibold leading-snug text-charcoal">
-                      <Link href={`/trip-planner/trips/${trip.id}`} className="hover:text-maroon-800">
+                      <Link href={itineraryHref(trip.id)} className="hover:text-maroon-800">
                         {trip.name}
                       </Link>
                     </h2>
@@ -224,7 +225,7 @@ export function TripPlanner() {
                     <span className="font-semibold text-charcoal">{stopCount}</span>{' '}
                     {stopCount === 1 ? 'destination' : 'destinations'}
                   </span>
-                  <Link href={`/trip-planner/trips/${trip.id}`} className="btn-secondary btn-sm">
+                  <Link href={itineraryHref(trip.id)} className="btn-secondary btn-sm">
                     View itinerary
                   </Link>
                 </div>
@@ -243,7 +244,7 @@ export function TripPlanner() {
           void load();
           if (!editing) {
             toast({ variant: 'success', title: `Created “${trip.name}”` });
-            router.push(`/trip-planner/trips/${trip.id}`);
+            router.push(itineraryHref(trip.id));
           } else {
             toast({ variant: 'success', title: 'Trip updated' });
           }

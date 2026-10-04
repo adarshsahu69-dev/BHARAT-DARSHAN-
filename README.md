@@ -101,10 +101,11 @@ src/
 ├── app/                     # App Router routes (50 prerendered pages)
 │   ├── destinations/[slug]/ # one page per record, generateStaticParams
 │   ├── timeline/[period]/   # one page per historical period
-│   ├── trip-planner/        # trip list and itinerary builder
+│   ├── trip-planner/        # trip list, and trips/view?trip=<id> itinerary
 │   ├── dashboard/           # saved places, trips, profile
 │   ├── admin/               # role-gated content management
-│   ├── auth/callback/       # OAuth and email-confirmation landing
+│   ├── auth/callback/       # OAuth and email-confirmation landing (a page,
+│   │                         #   not a route handler: the site is a static export)
 │   ├── sitemap.ts robots.ts error.tsx global-error.tsx not-found.tsx
 │
 ├── components/
@@ -130,16 +131,19 @@ src/
 │   ├── config.ts            # every integration resolved in one place
 │   ├── types.ts             # domain types, mirroring the SQL schema
 │   ├── auth/                # AuthClient interface, Supabase + demo impls
-│   ├── supabase/            # browser, server, middleware, service-role
+│   ├── supabase/            # browser client, service-role
 │   ├── store/user-data.ts   # saved places, trips, activity
 │   ├── maps/google-maps.ts  # URL-scheme directions and navigation
 │   ├── search/              # weighted field scoring and fuzzy matching
 │   ├── discovery/           # filter, sort, paginate
 │   ├── seo/                 # JSON-LD builders, metadata helpers
+│   ├── routes.ts            # itineraryHref(), the one place a trip URL is built
 │   └── utils.ts             # dates, geo, formatting, fuzzy scoring
-│
-└── middleware.ts            # session refresh + route guards (Supabase mode)
 ```
+
+There is no `middleware.ts`: GitHub Pages runs no middleware. The browser
+Supabase client keeps the session fresh on its own, and Row Level Security — not
+middleware — is what authorises a request.
 
 ### The integration layer
 
@@ -276,17 +280,43 @@ out of the sitemap, because the two would otherwise contradict each other.
 
 ---
 
-## Deploying to Vercel
+## Deploying
 
-```bash
-npm i -g vercel
-vercel
-```
+The site is a **static export** (`output: 'export'` in `next.config.mjs`) because
+it is published to GitHub Pages, which serves files and runs no server. Everything
+is prerendered at build time; the browser does the rest.
 
-The build needs no environment variables. To enable real accounts, add the
-Supabase variables in the project settings, apply the migration, and promote an
-admin. Set `NEXT_PUBLIC_SITE_URL` to the deployed origin so canonical URLs and
-the sitemap are correct.
+`.github/workflows/nextjs.yml` builds and publishes it. The workflow uses
+`actions/configure-pages` to inject the Pages `basePath`, which is why the config
+is `next.config.mjs`: the action only patches `.js`, `.cjs` and `.mjs`, and with a
+`next.config.ts` it would silently create a blank `next.config.js` that Next then
+loads in preference to the TypeScript one. The committed config must be the file
+that builds the deployed site.
+
+What a static host rules out, and where it went instead:
+
+| Not available on Pages | What the app does now |
+| --- | --- |
+| Middleware | Removed. The browser Supabase client refreshes the session itself; RLS is unaffected. |
+| Route handlers | `/auth/callback` is a prerendered page that completes the PKCE exchange in the browser. |
+| Per-request rendering | Filtered and per-user pages are prerendered shells; the existing `Suspense` boundaries show skeletons until the browser renders real content. |
+| Per-trip URLs from a dynamic segment | The itinerary is one prerendered page, `/trip-planner/trips/view?trip=<id>`. Trip ids are created in the browser, so no build can know them. Build links with `itineraryHref()` in `src/lib/routes.ts`. |
+| Image optimisation | `images.unoptimized` — `next/image` still lays out and lazy-loads, but serves the original image. |
+| Security headers | `headers()` is retained for `next dev`; GitHub Pages cannot set response headers, so the deployed site does not get them. |
+
+Two settings are required for real accounts on Pages:
+
+1. `NEXT_PUBLIC_SITE_URL` must be the deployed origin **including the repository
+   path**, e.g. `https://<user>.github.io/bharat-darshan`. It is what Google
+   OAuth and email confirmation links redirect back to.
+2. In Supabase → Authentication → URL Configuration, add
+   `<origin>/auth/callback` to the redirect allow-list.
+
+Everything else is optional: with no variables set the app runs in demo mode.
+
+To publish somewhere that does run a server, drop `output: 'export'`,
+`trailingSlash` and `images.unoptimized` from `next.config.mjs`; no application
+code has to change.
 
 ---
 

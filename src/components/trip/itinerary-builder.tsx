@@ -43,6 +43,7 @@ import {
   sumRoute,
 } from '@/lib/utils';
 import type { TripWithStops } from '@/lib/types';
+import { itineraryHref } from '@/lib/routes';
 
 /**
  * Itinerary builder.
@@ -131,7 +132,7 @@ export function ItineraryBuilder({ tripId }: { tripId: string }) {
             <button
               type="button"
               className="btn-primary"
-              onClick={() => redirectToLogin(`/trip-planner/trips/${tripId}`)}
+              onClick={() => redirectToLogin(itineraryHref(tripId))}
             >
               Sign in
             </button>

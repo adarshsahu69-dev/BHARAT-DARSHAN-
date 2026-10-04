@@ -30,6 +30,7 @@ import { ConfirmDialog, useDisclosure } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
 import { cn, daysBetween, formatDateRange, relativeTime } from '@/lib/utils';
 import type { Destination, Trip, TripWithStops, UserActivity } from '@/lib/types';
+import { itineraryHref } from '@/lib/routes';
 
 interface DashboardData {
   saved: Destination[];
@@ -285,7 +286,7 @@ export function Dashboard() {
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="min-w-0">
                             <h3 className="text-base font-semibold text-charcoal">
-                              <Link href={`/trip-planner/trips/${trip.id}`} className="hover:text-maroon-800">
+                              <Link href={itineraryHref(trip.id)} className="hover:text-maroon-800">
                                 {trip.name}
                               </Link>
                             </h3>
@@ -321,7 +322,7 @@ export function Dashboard() {
                                 In progress
                               </span>
                             )}
-                            <Link href={`/trip-planner/trips/${trip.id}`} className="btn-secondary btn-sm">
+                            <Link href={itineraryHref(trip.id)} className="btn-secondary btn-sm">
                               Open
                             </Link>
                             <button
