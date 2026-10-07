@@ -25,8 +25,18 @@ const PLACEHOLDERS = new Set([
 
 const isReal = (value: string) => value.length > 0 && !PLACEHOLDERS.has(value.toLowerCase());
 
+const sanitizeSupabaseUrl = (url: string | null): string | null => {
+  if (!url) return null;
+  try {
+    // Strip any path, query, or hash so auth/DB calls hit the correct endpoints.
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+};
+
 export const supabaseConfig = {
-  url: isReal(rawSupabaseUrl) ? rawSupabaseUrl : null,
+  url: sanitizeSupabaseUrl(isReal(rawSupabaseUrl) ? rawSupabaseUrl : null),
   anonKey: isReal(rawSupabaseKey) ? rawSupabaseKey : null,
 } as const;
 
