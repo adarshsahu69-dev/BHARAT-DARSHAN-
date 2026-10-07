@@ -40,6 +40,10 @@ export const supabaseConfig = {
   anonKey: isReal(rawSupabaseKey) ? rawSupabaseKey : null,
 } as const;
 
+if (typeof window !== 'undefined') {
+  console.info('[BHARAT DARSHAN] Supabase URL:', supabaseConfig.url);
+}
+
 export const isSupabaseConfigured = Boolean(supabaseConfig.url && supabaseConfig.anonKey);
 
 /**
