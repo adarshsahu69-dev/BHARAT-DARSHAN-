@@ -29,6 +29,8 @@ const nextConfig = {
    */
   output: 'export',
   trailingSlash: true,
+  basePath: '',       // <--- ADD THIS
+  assetPrefix: '',    // <--- ADD THIS
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
