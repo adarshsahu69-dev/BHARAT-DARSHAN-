@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Verification {
+  VERIFIED
+  UNVERIFIED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  name          String   @default("")
+  role          Role     @default(USER)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Destination {
+  id                    String            @id @default(uuid())
+  slug                  String            @unique
+  name                  String
+  tagline               String            @default("")
+  description           String            @default("")
+  historicalDescription String            @default("")
+  state                 String
+  city                  String
+  latitude              Float
+  longitude             Float
+  category              String
+  historicalPeriod      String
+  imageUrl              String?
+  openingHours          String            @default("")
+  entryInformation      String            @default("")
+  bestSeason            String            @default("")
+  visitDurationMinutes  Int               @default(60)
+  unescoYear            Int?
+  unescoListId          Int?
+  significanceScore     Int               @default(3)
+  featured              Boolean           @default(false)
+  verification          Verification      @default(UNVERIFIED)
+  tags                  String[]
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  sources               DestinationSource[]
+  images                DestinationImage[]
+
+  @@map("destinations")
+}
+
+model DestinationSource {
+  id            String      @id @default(uuid())
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  title         String
+  url           String
+  sourceType    String      @default("Other")
+  note          String?
+  createdAt     DateTime    @default(now())
+
+  @@map("destination_sources")
+}
+
+model DestinationImage {
+  id            String      @id @default(uuid())
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  imageUrl      String
+  caption       String?
+  source        String?
+  position      Int         @default(0)
+  createdAt     DateTime    @default(now())
+
+  @@map("destination_images")
+}
+
+model ContentReport {
+  id              String   @id @default(uuid())
+  destinationId   String?
+  destinationName String
+  reporterEmail   String
+  reason          String
+  details         String?
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("content_reports")
+}

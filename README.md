@@ -41,6 +41,8 @@ Two pre-seeded demo accounts let you look at both sides of the product:
 | `npm start`            | Serve the production build         |
 | `npm run typecheck`    | `tsc --noEmit`                     |
 | `npm run lint`         | ESLint (flat config)             |
+| `npm run prisma:deploy` | Apply Prisma migrations (admin panel) |
+| `npm run db:seed`      | Create the first admin (admin panel) |
 
 ---
 
@@ -97,15 +99,17 @@ GOOGLE_MAPS_SERVER_KEY=""            # server-only, for Geocoding
 ## Architecture
 
 ```
+prisma/                      # admin panel schema, migrations and seed
 src/
 ├── app/                     # App Router routes (50 prerendered pages)
 │   ├── destinations/[slug]/ # one page per record, generateStaticParams
 │   ├── timeline/[period]/   # one page per historical period
 │   ├── trip-planner/        # trip list, and trips/view?trip=<id> itinerary
 │   ├── dashboard/           # saved places, trips, profile
+│   ├── api/auth/[...nextauth]/ # NextAuth route handler (admin session)
 │   ├── admin/               # role-gated content management
 │   ├── auth/callback/       # OAuth and email-confirmation landing (a page,
-│   │                         #   not a route handler: the site is a static export)
+│   │                         #   not a route handler)
 │   ├── sitemap.ts robots.ts error.tsx global-error.tsx not-found.tsx
 │
 ├── components/
@@ -129,8 +133,10 @@ src/
 │
 ├── lib/
 │   ├── config.ts            # every integration resolved in one place
+│   ├── db.ts                # Prisma client singleton for the admin panel
 │   ├── types.ts             # domain types, mirroring the SQL schema
 │   ├── auth/                # AuthClient interface, Supabase + demo impls
+│   │                         # next-auth.ts (admin Credentials + JWT sessions)
 │   ├── supabase/            # browser client, service-role
 │   ├── store/user-data.ts   # saved places, trips, activity
 │   ├── maps/google-maps.ts  # URL-scheme directions and navigation
@@ -141,9 +147,10 @@ src/
 │   └── utils.ts             # dates, geo, formatting, fuzzy scoring
 ```
 
-There is no `middleware.ts`: GitHub Pages runs no middleware. The browser
-Supabase client keeps the session fresh on its own, and Row Level Security — not
-middleware — is what authorises a request.
+There is no `middleware.ts`: the browser Supabase client keeps the visitor
+session fresh on its own, and Row Level Security — not middleware — is what
+authorises a request. The `/admin` panel is gated separately, server-side, by
+the NextAuth session; see "Admin panel (Prisma + NextAuth)" below.
 
 ### The integration layer
 
@@ -168,6 +175,66 @@ account and no domain registration — so it is the primary map rather than a
 fallback. The *actions* (directions, route, navigation) go to **Google Maps**,
 because that is where live traffic and turn-by-turn directions actually live.
 Neither choice requires a key to ship.
+
+---
+
+## Admin panel (Prisma + NextAuth)
+
+The admin panel is a second, server-backed half of the same codebase: **Next.js
+15 App Router + PostgreSQL through Prisma + NextAuth** (Credentials provider, JWT
+sessions, bcrypt password hashing) with **hand-written add/edit/delete forms**.
+There is no second app, no second deploy and no second framework.
+
+**Deployment consequence:** the app is **no longer a static GitHub Pages
+export**. Prisma, NextAuth and the route handlers need a Node process, so
+`output: 'export'` and `trailingSlash` have been removed from
+`next.config.mjs`, the image optimiser is switched back on, and
+`.github/workflows/nextjs.yml` is a CI pipeline rather than a Pages deployment.
+Deploy to any Node host: **Vercel, Render, Railway or Fly.io**.
+
+### Setup, in order
+
+```bash
+cp .env.example .env.local       # then set DATABASE_URL and AUTH_SECRET
+npm install                      # postinstall runs `prisma generate`
+npm run prisma:deploy            # applies prisma/migrations
+npm run db:seed                  # creates the first admin (ADMIN_EMAIL / ADMIN_PASSWORD)
+npm run dev
+```
+
+Then sign in at <http://localhost:3000/admin/login>.
+
+- `DATABASE_URL` points at a **dedicated** Postgres database. Keep it separate
+  from the Supabase project above: pointing Prisma at that database would
+  collide with the Row Level Security migration tables.
+- `AUTH_SECRET` signs the admin session JWTs — generate one with
+  `openssl rand -base64 32`. It is required in production.
+- The first administrator comes from `ADMIN_EMAIL` and `ADMIN_PASSWORD`; change
+  the password after the first login.
+
+### What it manages
+
+| Area | What you can do |
+| --- | --- |
+| Destinations | Add, edit and delete: name, slug, tagline, overview/description, state, city, latitude, longitude, category, historical period, review status, featured flag, UNESCO inscription year. |
+| Users | Browse the user list. |
+| Reports | Browse the report list and move a report between statuses. |
+| Analytics | Counts and trends computed from the database records, not hardcoded. |
+
+Access control is server-side: `/admin` checks the `ADMIN` role on the session,
+and every server action re-checks it. Gating the UI alone is not the boundary.
+
+### Prisma workflow
+
+| Command | Purpose |
+| --- | --- |
+| `npm run prisma:generate` | Regenerate the client (also runs on `npm install`) |
+| `npm run prisma:migrate` | Development: create and apply a new migration |
+| `npm run prisma:deploy` | Production: apply the existing `prisma/migrations` |
+| `npm run db:seed` | Seed the first administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
+
+The client is generated from `prisma/schema.prisma`; migrations are applied with
+`prisma migrate` so the schema is versioned alongside the code.
 
 ---
 
@@ -282,41 +349,41 @@ out of the sitemap, because the two would otherwise contradict each other.
 
 ## Deploying
 
-The site is a **static export** (`output: 'export'` in `next.config.mjs`) because
-it is published to GitHub Pages, which serves files and runs no server. Everything
-is prerendered at build time; the browser does the rest.
+The app **runs on a Node server**: Prisma, NextAuth and the route handlers need
+one. It is deployed to a Node host — Vercel, Render, Railway or Fly.io — not to
+a static file host.
 
-`.github/workflows/nextjs.yml` builds and publishes it. The workflow uses
-`actions/configure-pages` to inject the Pages `basePath`, which is why the config
-is `next.config.mjs`: the action only patches `.js`, `.cjs` and `.mjs`, and with a
-`next.config.ts` it would silently create a blank `next.config.js` that Next then
-loads in preference to the TypeScript one. The committed config must be the file
-that builds the deployed site.
+`.github/workflows/nextjs.yml` is the CI pipeline: it checks out the repo,
+installs with `npm ci` (whose `postinstall` runs `prisma generate`), then runs
+`npm run lint`, `npm run typecheck` and `npm run build`. It deploys nothing —
+that is the host's job — and it needs no environment variables to pass, because
+the app builds in demo mode when nothing is configured.
 
-What a static host rules out, and where it went instead:
+What a Node host gives the app, and where the constraint used to land:
 
-| Not available on Pages | What the app does now |
+| Needed a server | What the app does now |
 | --- | --- |
-| Middleware | Removed. The browser Supabase client refreshes the session itself; RLS is unaffected. |
-| Route handlers | `/auth/callback` is a prerendered page that completes the PKCE exchange in the browser. |
-| Per-request rendering | Filtered and per-user pages are prerendered shells; the existing `Suspense` boundaries show skeletons until the browser renders real content. |
-| Per-trip URLs from a dynamic segment | The itinerary is one prerendered page, `/trip-planner/trips/view?trip=<id>`. Trip ids are created in the browser, so no build can know them. Build links with `itineraryHref()` in `src/lib/routes.ts`. |
-| Image optimisation | `images.unoptimized` — `next/image` still lays out and lazy-loads, but serves the original image. |
-| Security headers | `headers()` is retained for `next dev`; GitHub Pages cannot set response headers, so the deployed site does not get them. |
+| Route handlers | `/api/auth/[...nextauth]` handles the admin session; `/auth/callback` is still a page that completes the PKCE exchange in the browser. |
+| Per-request rendering | Filtered and per-user pages render per request where a database is involved; the existing `Suspense` boundaries still show skeletons. |
+| Image optimisation | `next/image` optimises again — `images.unoptimized` is gone, `formats` and `remotePatterns` are kept. |
+| Security headers | `headers()` in `next.config.mjs` is honoured by the Node host, so the deployed site does receive them. |
+| Extensionless URLs | `trailingSlash` is gone; a Node server resolves route URLs itself. |
 
-Two settings are required for real accounts on Pages:
+What you still have to set for real accounts:
 
-1. `NEXT_PUBLIC_SITE_URL` must be the deployed origin **including the repository
-   path**, e.g. `https://<user>.github.io/bharat-darshan`. It is what Google
-   OAuth and email confirmation links redirect back to.
+1. `NEXT_PUBLIC_SITE_URL` must be the deployed origin, e.g.
+   `https://bharat-darshan.example.com`. It is what Google OAuth and email
+   confirmation links redirect back to.
 2. In Supabase → Authentication → URL Configuration, add
    `<origin>/auth/callback` to the redirect allow-list.
 
-Everything else is optional: with no variables set the app runs in demo mode.
+For the admin panel, also set `DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL` and
+`ADMIN_PASSWORD` on the host, and run the migrations and seed as part of the
+deploy (`npm run prisma:deploy`, then `npm run db:seed`). See
+"Admin panel (Prisma + NextAuth)" above.
 
-To publish somewhere that does run a server, drop `output: 'export'`,
-`trailingSlash` and `images.unoptimized` from `next.config.mjs`; no application
-code has to change.
+Everything else is optional: with no variables set the public site still runs in
+demo mode.
 
 ---
 
