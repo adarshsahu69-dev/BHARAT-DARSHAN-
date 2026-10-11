@@ -19,7 +19,13 @@ export const authOptions: NextAuthOptions = {
         const email = String(credentials?.email ?? '').trim().toLowerCase();
         const password = String(credentials?.password ?? '');
         if (!email || !password) return null;
-        const user = await prisma.user.findUnique({ where: { email } });
+        let user;
+        try {
+          user = await prisma.user.findUnique({ where: { email } });
+        } catch (error) {
+          console.error('Admin sign-in failed (database error):', error);
+          return null;
+        }
         if (!user) return null;
         if (!(await bcrypt.compare(password, user.passwordHash))) return null;
         return { id: user.id, email: user.email, name: user.name || user.email, role: user.role };
