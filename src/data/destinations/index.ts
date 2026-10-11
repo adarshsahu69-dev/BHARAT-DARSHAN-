@@ -1,22 +1,23 @@
-import { NORTH_INDIA_DESTINATIONS } from './north-india';
-import { SOUTH_INDIA_DESTINATIONS } from './south-india';
-import { WEST_INDIA_DESTINATIONS } from './west-india';
+import { MADHYA_PRADESH_DESTINATIONS } from './madhya-pradesh';
 import { commonsImage } from '../commons-images';
 import type { Category, Destination } from '@/lib/types';
 
 /**
- * The seed catalogue.
+ * The catalogue.
+ *
+ * The site is scoped to Madhya Pradesh only, so the catalogue is composed from
+ * the state's section alone. The regional seed files (north, south and west
+ * India) are deliberately excluded — to bring a region back, import its list
+ * here and add it to the spread. Every in-app surface (facets, search, map,
+ * sitemap, prerendered routes) derives from this array, so nothing else has
+ * to change.
  *
  * Every record here is a *draft* (`verification: 'unverified'`) until an editor
  * has checked it against the sources it cites. The UI labels these records
  * explicitly; nothing here is presented as an authenticated account of a
  * monument.
  */
-export const DESTINATIONS: Destination[] = [
-  ...NORTH_INDIA_DESTINATIONS,
-  ...WEST_INDIA_DESTINATIONS,
-  ...SOUTH_INDIA_DESTINATIONS,
-];
+export const DESTINATIONS: Destination[] = [...MADHYA_PRADESH_DESTINATIONS];
 
 /* ------------------------------------------------------------------ */
 /* Derived indexes                                                     */
@@ -91,7 +92,7 @@ export const CATEGORY_META: CategoryMeta[] = (
       name: 'Forts & Palaces',
       slug: 'forts-palaces',
       description: 'Defensive works and courtly residences across a thousand years of dynasties.',
-      imageFile: 'Amber Fort, Jaipur, 20191219 1012 9512.jpg',
+      imageFile: 'Gwalior fort view 003 (15).jpg',
       icon: 'Castle',
     },
     {
@@ -105,7 +106,7 @@ export const CATEGORY_META: CategoryMeta[] = (
       name: 'UNESCO Heritage',
       slug: 'unesco-heritage',
       description: 'Sites inscribed on the UNESCO World Heritage List.',
-      imageFile: 'Taj Mahal, Agra, India edit2.jpg',
+      imageFile: 'Khajuraho Dulhadeo 2010.jpg',
       icon: 'Award',
     },
     {
@@ -119,21 +120,21 @@ export const CATEGORY_META: CategoryMeta[] = (
       name: 'Buddhist Sites',
       slug: 'buddhist-sites',
       description: 'Monasteries, stupas and caves of the Buddhist traditions of South Asia.',
-      imageFile: 'Ajanta caves panorama 2010.jpg',
+      imageFile: 'Sanchi Stupa No 3.jpg',
       icon: 'Flower2',
     },
     {
       name: 'Historical Cities',
       slug: 'historical-cities',
       description: 'Living cities with continuous occupation and monumental cores.',
-      imageFile: 'Varanasi, India, Ghats on Ganges River.jpg',
+      imageFile: 'Gwalior fort view 003 (4).jpg',
       icon: 'Home',
     },
     {
       name: 'Archaeological Sites',
       slug: 'archaeological-sites',
       description: 'Excavated settlements, ruins and monuments under protection.',
-      imageFile: 'Dholavira archaeological site.jpg',
+      imageFile: 'Stupa 1, Sanchi 02.jpg',
       icon: 'Layers',
     },
     {
@@ -175,7 +176,7 @@ export const CATEGORY_META: CategoryMeta[] = (
       name: 'Hidden Gems',
       slug: 'hidden-gems',
       description: 'Places of real interest that receive comparatively few visitors.',
-      imageFile: 'Hampi, India, Hampi landscape.jpg',
+      imageFile: 'Shantinath Jain Temple, Khajuraho India.JPG',
       icon: 'Compass',
     },
   ] as const satisfies readonly (Omit<CategoryMeta, 'imageUrl'> & { name: Category })[]
@@ -199,36 +200,40 @@ export function getCategoryMeta(name: Category): CategoryMeta {
 /* ------------------------------------------------------------------ */
 
 /** Wide hero image for the homepage. Verified Wikimedia Commons file. */
-export const HERO_IMAGE: string | null = commonsImage('Hampi, India, Hampi landscape.jpg');
+export const HERO_IMAGE: string | null = commonsImage(
+  'Kandariya Mahadeva Temple, Khajuraho, Madhya Pradesh.jpg',
+);
 
-export const HERO_IMAGE_CREDIT: string = '“Hampi, India, Hampi landscape.jpg” on Wikimedia Commons';
+export const HERO_IMAGE_CREDIT: string =
+  '“Kandariya Mahadeva Temple, Khajuraho, Madhya Pradesh.jpg” on Wikimedia Commons';
 export const HERO_IMAGE_CREDIT_URL: string =
-  'https://commons.wikimedia.org/wiki/File:Hampi,_India,_Hampi_landscape.jpg';
+  'https://commons.wikimedia.org/wiki/File:Kandariya_Mahadeva_Temple,_Khajuraho,_Madhya_Pradesh.jpg';
 
 /** Rotating images for the hero crossfade, all verified Commons files. */
 export const HERO_SLIDES: { url: string; credit: string; creditUrl: string; alt: string }[] = [
   {
-    url: commonsImage('Hampi, India, Hampi landscape.jpg') ?? '',
-    credit: '“Hampi, India, Hampi landscape.jpg” on Wikimedia Commons',
-    creditUrl: 'https://commons.wikimedia.org/wiki/File:Hampi,_India,_Hampi_landscape.jpg',
-    alt: 'The boulder landscape of Hampi, Karnataka, with the ruins of the Vijayanagara capital.',
+    url: commonsImage('Kandariya Mahadeva Temple, Khajuraho, Madhya Pradesh.jpg') ?? '',
+    credit: '“Kandariya Mahadeva Temple, Khajuraho, Madhya Pradesh.jpg” on Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Kandariya_Mahadeva_Temple,_Khajuraho,_Madhya_Pradesh.jpg',
+    alt: 'Kandariya Mahadeva temple at Khajuraho, Madhya Pradesh, the tallest of the Chandela temples.',
   },
   {
-    url: commonsImage('Taj Mahal, Agra, India edit2.jpg') ?? '',
-    credit: '“Taj Mahal, Agra, India edit2.jpg” on Wikimedia Commons',
-    creditUrl: 'https://commons.wikimedia.org/wiki/File:Taj_Mahal,_Agra,_India_edit2.jpg',
-    alt: 'The Taj Mahal at Agra seen across the reflecting channel of its garden.',
+    url: commonsImage('Great Sanchi Stupa (3).jpg') ?? '',
+    credit: '“Great Sanchi Stupa (3).jpg” on Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Great_Sanchi_Stupa_(3).jpg',
+    alt: 'The Great Stupa at Sanchi, Madhya Pradesh, begun under Ashoka and enlarged by later dynasties.',
   },
   {
-    url: commonsImage('Ajanta caves panorama 2010.jpg') ?? '',
-    credit: '“Ajanta caves panorama 2010.jpg” on Wikimedia Commons',
-    creditUrl: 'https://commons.wikimedia.org/wiki/File:Ajanta_caves_panorama_2010.jpg',
-    alt: 'The horseshoe gorge of the Ajanta caves, Maharashtra.',
+    url: commonsImage('Gwalior fort view 003 (15).jpg') ?? '',
+    credit: '“Gwalior fort view 003 (15).jpg” on Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Gwalior_fort_view_003_(15).jpg',
+    alt: 'Gwalior Fort, Madhya Pradesh, seen across the Tamas river plain from the southern approach.',
   },
   {
-    url: commonsImage('Kumbhalgarh Fort viewed at Sunset.JPG') ?? '',
-    credit: '“Kumbhalgarh Fort viewed at Sunset.JPG” on Wikimedia Commons',
-    creditUrl: 'https://commons.wikimedia.org/wiki/File:Kumbhalgarh_Fort_viewed_at_Sunset.JPG',
-    alt: 'Kumbhalgarh Fort in Rajasthan seen at sunset.',
+    url: commonsImage('Stupa 1, Sanchi 02.jpg') ?? '',
+    credit: '“Stupa 1, Sanchi 02.jpg” on Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Stupa_1,_Sanchi_02.jpg',
+    alt: 'The western torana of the Great Stupa at Sanchi, carved in the second century BCE.',
   },
 ].filter((s) => s.url.length > 0);

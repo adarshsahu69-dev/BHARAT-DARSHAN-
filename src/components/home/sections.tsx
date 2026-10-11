@@ -50,15 +50,6 @@ export function SectionHeading({
 
 const STATE_BLURBS: Record<string, string> = {
   'Madhya Pradesh': 'Bhakti-era temples, Buddhist stupas and hill forts across the Narmada basin.',
-  Delhi: 'Five centuries of imperial capital, from the Delhi Sultanate to the Mughal court.',
-  'Uttar Pradesh': 'The Mughal heartland, and the Ganga plain it was built across.',
-  Rajasthan: 'Rajput hill forts, stepwells and the planned Pink City of Jaipur.',
-  Gujarat: 'Harappan cities, Solanki stepwells and a coastline of temple towns.',
-  Maharashtra: 'Rock-cut caves at Ajanta and Ellora, and the Deccan Sultanate capitals.',
-  Karnataka: 'The Vijayanagara capital at Hampi and the Chalukya temples at Pattadakal.',
-  'Tamil Nadu': 'Pallava shore temples and the living temple city of Madurai.',
-  Odisha: 'Kalinga temple architecture, from Mukteshwar to the chariot at Konark.',
-  Bihar: 'The monastic university at Nalanda and the place of awakening at Bodh Gaya.',
 };
 
 export function ExploreIndiaSection() {
