@@ -1,0 +1,66 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# One-click deploy for Bharat Darshan. In Render: New + → Blueprint → connect
+# this repository. This file provisions the web service only — no databases.
+
+# NO RENDER DATABASE — ON PURPOSE.
+# The admin panel's Postgres must be an EXTERNAL database with a real free tier
+# (Neon: https://neon.com, or a second Supabase project). Render's managed
+# Postgres free tier expires after 90 days, so it is deliberately not used here.
+# Create one first, then paste its connection string into DATABASE_URL when the
+# blueprint asks for the secret values.
+
+# AFTER THE FIRST DEPLOY, RUN ONCE (Render dashboard → your service → Shell,
+# or locally with DATABASE_URL exported) so the tables and admin login exist:
+#   npx prisma migrate deploy
+#   node prisma/seed.mjs
+# Then sign in at https://<your-url>/admin/login.
+
+# NOTE: Render's free web service plan sleeps after ~15 minutes of inactivity,
+# so the first visit after an idle period takes 30-60 seconds to wake up.
+
+services:
+  - type: web
+    name: bharat-darshan
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # Node 22 — the oldest version Next.js 15 builds on cleanly
+      - key: NODE_VERSION
+        value: "22"
+
+      # --- Admin panel database: EXTERNAL Postgres, set in the dashboard ---
+      - key: DATABASE_URL
+        sync: false
+
+      # --- Admin panel login: NextAuth secret (generated at deploy time) ---
+      - key: AUTH_SECRET
+        generateValue: true
+
+      # --- URLs: must exactly match the address you open in the browser.
+      # If you test on the default https://bharat-darshan.onrender.com URL
+      # before attaching the custom domain, change both values to that first.
+      - key: NEXTAUTH_URL
+        value: https://bharatdarshana.we24.in
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://bharatdarshana.we24.in
+
+      # --- Public site: Supabase, same values as .env.example ---
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      # --- First administrator, read by `node prisma/seed.mjs`.
+      # Leave blank to use the seed defaults, then change the password. ---
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

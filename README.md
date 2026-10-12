@@ -359,6 +359,30 @@ installs with `npm ci` (whose `postinstall` runs `prisma generate`), then runs
 that is the host's job — and it needs no environment variables to pass, because
 the app builds in demo mode when nothing is configured.
 
+### Deploy to Render (one-click blueprint)
+
+`render.yaml` in the repository root is a Render Blueprint, so the service can be
+created without typing any settings:
+
+1. In Render: **New + → Blueprint** → connect this repository.
+2. It prompts for the secret values — paste an **external** Postgres connection
+   string for `DATABASE_URL` (Neon or a second Supabase project; Render's own
+   managed Postgres is deliberately **not** used, because its free tier expires
+   after 90 days), the three Supabase values, and optionally `ADMIN_EMAIL` /
+   `ADMIN_PASSWORD`.
+3. Deploy, then run **once** in the Render Shell (or locally with `DATABASE_URL`
+   exported): `npx prisma migrate deploy && node prisma/seed.mjs`.
+4. Attach the custom domain `bharatdarshana.we24.in` in Render → Settings →
+   Custom Domains, and keep `NEXTAUTH_URL` / `NEXT_PUBLIC_SITE_URL` pointing at it.
+   The `CNAME` file in the repo root is a GitHub Pages artifact — Render ignores
+   it, and it can be deleted.
+
+The blueprint pins Node 22, builds with `npm ci && npm run build` and starts with
+`npm start`. The two URL variables are pre-filled for `bharatdarshana.we24.in` —
+change them to `https://bharat-darshan.onrender.com` if you test on the default
+Render URL first. Free web services sleep after inactivity, so the first visit
+after an idle period is slow.
+
 What a Node host gives the app, and where the constraint used to land:
 
 | Needed a server | What the app does now |
